@@ -10,6 +10,14 @@ public class Parser {
         this.tokens = tokens;
     }
 
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null; // Parsing failed, return null
+        }
+    }
+
     /*
      * expression  → equality ;
      */
