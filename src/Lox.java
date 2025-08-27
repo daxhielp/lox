@@ -14,7 +14,7 @@ public class Lox {
 
     public static void main(String[] args) throws IOException{
         if (args.length >  1) {
-            System.out.println("Usage: jlox [script]");
+            System.out.println("Usage: lox [script]");
             System.exit(64);
         } else if (args.length == 1) {
             runFile(args[0]);
@@ -25,7 +25,7 @@ public class Lox {
 
     private static void runFile(String path) throws IOException{
         /*
-         * Runs jlox with from a source file destination
+         * Runs lox with from a source file destination
          */
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
@@ -36,7 +36,7 @@ public class Lox {
 
     private static void runPrompt() throws IOException {
         /*
-         * Runs jlox from a new terminal window, allowing for line-by-line execution
+         * Runs lox from a new terminal window, allowing for line-by-line execution
          */
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
@@ -51,11 +51,21 @@ public class Lox {
     }
 
     private static void run(String source) {
+        /*
+         * Central run command for lox
+         * Passes the source code to the scanner, which returns a list of tokens
+         * The parser then converts the tokens into a list of statements
+         */
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
+
+        if (hadError) return;
+
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
 
         if (hadError) return;
 
